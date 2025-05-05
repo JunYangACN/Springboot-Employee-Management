@@ -23,11 +23,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth", "/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                    .requestMatchers(
+                        "/api/auth",
+                                    "/api/auth/register",
+                                    "/api/auth/login",
+                                    "/api/auth/home",
+                                    "/css/**",
+                                    "/js/**").permitAll() // Allow auth endpoints
+                    .requestMatchers("/api/auth/home").permitAll()
+                    .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // Add JwtFilter
                 .build();
     }
 

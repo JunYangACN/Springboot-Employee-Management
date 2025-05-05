@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login & Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div id="login-section">
+            <h1>Login</h1>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="button" class="btn-primary" onclick="submitLogin()">Login</button>
+            </form>
+        </div>
+
+        <!-- Registration Form -->
+        <div id="register-section" style="display: none;">
+            <h1>Register</h1>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="reg-username">Username:</label>
+                    <input type="text" id="reg-username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password:</label>
+                    <input type="password" id="reg-password" name="password" required>
+                </div>
+                <button type="button" class="btn-primary" onclick="submitRegister()">Register</button>
+            </form>
+        </div>
+
+        <!-- Toggle Link -->
+        <div class="toggle-link" id="toggle-link" onclick="toggleForms()">
+            Don't have an account? Register here
+        </div>
+    </div>
+
+    <script>
+        // Toggle between login and registration forms
+        function toggleForms() {
+            const loginSection = document.getElementById('login-section');
+            const registerSection = document.getElementById('register-section');
+            const toggleLink = document.getElementById('toggle-link');
+            
+            if (loginSection.style.display === 'none') {
+                loginSection.style.display = 'block';
+                registerSection.style.display = 'none';
+                toggleLink.textContent = 'Don\'t have an account? Register here';
+            } else {
+                loginSection.style.display = 'none';
+                registerSection.style.display = 'block';
+                toggleLink.textContent = 'Already have an account? Login here';
+            }
+        }
+
+        // Handle login submission
+        async function submitLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('username', username);
+
+                // Redirect to home page
+                window.location.href = '/api/auth/home';
+
+            } catch (error) {
+                console.error('Login failed:', error);
+                alert('Login failed. Please check your credentials.');
+            }
+        }
+
+        // Handle registration submission
+        async function submitRegister() {
+            const username = document.getElementById('reg-username').value;
+            const password = document.getElementById('reg-password').value;
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Registration failed! status: ${response.status}`);
+                }
+
+                alert('Registration successful! Please login.');
+                toggleForms();
+
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('Registration failed. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>

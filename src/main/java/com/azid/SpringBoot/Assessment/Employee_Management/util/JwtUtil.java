@@ -1,11 +1,12 @@
 package com.azid.SpringBoot.Assessment.Employee_Management.util;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Component
@@ -17,14 +18,13 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private long expiration;
 
-    private Key getSignKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+    private SecretKey getSignKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes()); // Ensure the secret is at least 32 bytes
     }
 
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
-                .setIssuer("employee-system")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
@@ -49,4 +49,3 @@ public class JwtUtil {
         }
     }
 }
-

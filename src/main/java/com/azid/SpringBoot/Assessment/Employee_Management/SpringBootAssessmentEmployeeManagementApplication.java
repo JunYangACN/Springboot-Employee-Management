@@ -9,5 +9,4 @@ public class SpringBootAssessmentEmployeeManagementApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SpringBootAssessmentEmployeeManagementApplication.class, args);
 	}
-
 }

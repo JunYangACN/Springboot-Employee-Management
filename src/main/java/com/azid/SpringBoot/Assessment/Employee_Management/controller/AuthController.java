@@ -23,7 +23,7 @@ public class AuthController {
 
     @GetMapping
     public String authPage() {
-        return "auth"; // This maps to auth.html in the templates folder
+        return "auth";
     }
 
     @PostMapping("/register")
@@ -46,5 +46,10 @@ public class AuthController {
         UserDetails user = userService.loadUserByUsername(request.getUsername());
         String token = jwtUtil.generateToken(user.getUsername());
         return new UserResponseDTO(token);
+    }
+
+    @GetMapping("/home")
+    public String home() {
+        return "home"; // Ensure home.html exists in templates/
     }
 }
