@@ -16,7 +16,7 @@ public class EmployeeDTO {
     private Long id;
 
     @NotBlank(message = "Employee Name is required")
-    private String employeeName;
+    private String name;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
