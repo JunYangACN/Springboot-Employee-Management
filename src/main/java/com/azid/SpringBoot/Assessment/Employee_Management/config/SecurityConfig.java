@@ -29,7 +29,7 @@ public class SecurityConfig {
                                     "/api/auth/login",
                                     "/api/auth/home",
                                     "/css/**",
-                                    "/js/**").permitAll() // Allow auth endpoints
+                                    "/js/**").permitAll()
                     .requestMatchers("/api/auth/home").permitAll()
                     .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
