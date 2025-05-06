@@ -55,7 +55,7 @@ public class EmployeeService {
                 .orElseThrow(() -> new EmployeeNotFoundException("Employee with ID " + id + " not found"));
 
         // Update fields
-        existing.setEmployeeName(employeeDTO.getEmployeeName());
+        existing.setName(employeeDTO.getEmployeeName());
         existing.setEmail(employeeDTO.getEmail());
         existing.setPhoneNo(employeeDTO.getPhoneNo());
 
