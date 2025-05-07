@@ -1,4 +1,4 @@
-package com.azid.SpringBoot.Assessment.Employee_Management.util;
+package com.azid.springboot.assessment.employee_management.util;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

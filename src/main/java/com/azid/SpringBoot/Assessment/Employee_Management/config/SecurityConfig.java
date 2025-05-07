@@ -1,6 +1,6 @@
-package com.azid.SpringBoot.Assessment.Employee_Management.config;
+package com.azid.springboot.assessment.employee_management.config;
 
-import com.azid.SpringBoot.Assessment.Employee_Management.filter.JwtFilter;
+import com.azid.springboot.assessment.employee_management.filter.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

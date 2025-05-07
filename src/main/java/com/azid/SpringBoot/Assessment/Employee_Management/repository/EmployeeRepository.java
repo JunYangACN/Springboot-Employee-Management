@@ -1,7 +1,7 @@
-package com.azid.SpringBoot.Assessment.Employee_Management.repository;
+package com.azid.springboot.assessment.employee_management.repository;
 
 
-import com.azid.SpringBoot.Assessment.Employee_Management.entity.Employee;
+import com.azid.springboot.assessment.employee_management.entity.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EmployeeRepository extends JpaRepository<Employee,Long> {

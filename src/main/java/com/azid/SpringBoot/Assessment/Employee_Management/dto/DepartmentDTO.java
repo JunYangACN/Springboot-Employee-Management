@@ -1,4 +1,4 @@
-package com.azid.SpringBoot.Assessment.Employee_Management.dto;
+package com.azid.springboot.assessment.employee_management.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

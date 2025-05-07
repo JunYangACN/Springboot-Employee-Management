@@ -1,4 +1,4 @@
-package com.azid.SpringBoot.Assessment.Employee_Management.entity;
+package com.azid.springboot.assessment.employee_management.entity;
 
 
 import jakarta.persistence.*;
@@ -22,6 +22,4 @@ public class Department {
 
     @Column(name="description")
     private String description;
-
-
 }

@@ -1,9 +1,9 @@
-package com.azid.SpringBoot.Assessment.Employee_Management.mapper;
+package com.azid.springboot.assessment.employee_management.mapper;
 
-import com.azid.SpringBoot.Assessment.Employee_Management.dto.DepartmentDTO;
-import com.azid.SpringBoot.Assessment.Employee_Management.dto.EmployeeDTO;
-import com.azid.SpringBoot.Assessment.Employee_Management.entity.Department;
-import com.azid.SpringBoot.Assessment.Employee_Management.entity.Employee;
+import com.azid.springboot.assessment.employee_management.dto.DepartmentDTO;
+import com.azid.springboot.assessment.employee_management.dto.EmployeeDTO;
+import com.azid.springboot.assessment.employee_management.entity.Department;
+import com.azid.springboot.assessment.employee_management.entity.Employee;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

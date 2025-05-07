@@ -1,4 +1,4 @@
-package com.azid.SpringBoot.Assessment.Employee_Management.dto;
+package com.azid.springboot.assessment.employee_management.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -22,7 +22,6 @@ public class EmployeeDTO {
     @Email(message = "Invalid email format")
     private String email;
 
-
     @Pattern(
             regexp = "^\\+?\\d{1,3}?[- .]?\\(?(\\d{1,4})\\)?[- .]?\\d{1,4}[- .]?\\d{1,9}$",
             message = "Invalid phone number format"
@@ -30,8 +29,4 @@ public class EmployeeDTO {
     private String phoneNo;
 
     private DepartmentDTO department;
-
-
-
-
 }
