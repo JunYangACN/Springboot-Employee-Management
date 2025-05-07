@@ -1,4 +1,4 @@
-package com.azid.SpringBoot.Assessment.Employee_Management;
+package com.azid.springboot.assessment.employee_management;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

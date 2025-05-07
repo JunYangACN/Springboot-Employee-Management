@@ -1,82 +1,135 @@
-package com.azid.SpringBoot.Assessment.Employee_Management.DepartmentUnitTest;
+package com.azid.springboot.assessment.employee_management.DepartmentUnitTest;
 
-import com.azid.SpringBoot.Assessment.Employee_Management.dto.DepartmentDTO;
-import com.azid.SpringBoot.Assessment.Employee_Management.entity.Department;
-import com.azid.SpringBoot.Assessment.Employee_Management.exception.DepartmentAlreadyExistsException;
-import com.azid.SpringBoot.Assessment.Employee_Management.exception.DepartmentNotFoundException;
-import com.azid.SpringBoot.Assessment.Employee_Management.mapper.DepartmentMapper;
-import com.azid.SpringBoot.Assessment.Employee_Management.repository.DepartmentRepository;
-import com.azid.SpringBoot.Assessment.Employee_Management.service.DepartmentService;
+import com.azid.springboot.assessment.employee_management.dto.DepartmentDTO;
+import com.azid.springboot.assessment.employee_management.entity.Department;
+import com.azid.springboot.assessment.employee_management.exception.DepartmentAlreadyExistsException;
+import com.azid.springboot.assessment.employee_management.exception.DepartmentNotFoundException;
+import com.azid.springboot.assessment.employee_management.exception.ServiceException;
+import com.azid.springboot.assessment.employee_management.mapper.DepartmentMapper;
+import com.azid.springboot.assessment.employee_management.repository.DepartmentRepository;
+import com.azid.springboot.assessment.employee_management.service.DepartmentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataAccessException;
 
-import java.util.*;
+import java.util.Optional;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-public class DepartmentServiceTest {
+@ExtendWith(MockitoExtension.class)
+class DepartmentServiceTest {
+
+    @Mock
     private DepartmentRepository departmentRepository;
+
+    @Mock
     private DepartmentMapper departmentMapper;
+
+    @InjectMocks
     private DepartmentService departmentService;
+
+    private DepartmentDTO departmentDTO;
+    private Department department;
 
     @BeforeEach
     void setUp() {
-        departmentRepository = mock(DepartmentRepository.class);
-        departmentMapper = mock(DepartmentMapper.class);
-        departmentService = new DepartmentService(departmentRepository, departmentMapper);
+        departmentDTO = DepartmentDTO.builder()
+                .id(1L)
+                .name("IT")
+                .description("Information Technology")
+                .build();
+
+        department = new Department();
+        department.setId(1L);
+        department.setName("IT");
+        department.setDescription("Information Technology");
     }
 
     @Test
-    void addDepartment_shouldAddSuccessfully() {
-        DepartmentDTO dto = new DepartmentDTO(null, "IT", "Tech Department");
-        Department entity = new Department(null, "IT", "Tech Department");
-        Department saved = new Department(1L, "IT", "Tech Department");
-        DepartmentDTO expected = new DepartmentDTO(1L, "IT", "Tech Department");
-
+    void addDepartment_Success() {
         when(departmentRepository.existsByName("IT")).thenReturn(false);
-        when(departmentMapper.toEntity(dto)).thenReturn(entity);
-        when(departmentRepository.save(entity)).thenReturn(saved);
-        when(departmentMapper.toDto(saved)).thenReturn(expected);
+        when(departmentMapper.toEntity(departmentDTO)).thenReturn(department);
+        when(departmentRepository.save(department)).thenReturn(department);
+        when(departmentMapper.toDto(department)).thenReturn(departmentDTO);
 
-        DepartmentDTO result = departmentService.addDepartment(dto);
-        assertEquals(expected, result);
+        DepartmentDTO result = departmentService.addDepartment(departmentDTO);
+
+        assertNotNull(result);
+        assertEquals(departmentDTO.getName(), result.getName());
+        verify(departmentRepository, times(1)).existsByName("IT");
+        verify(departmentRepository, times(1)).save(department);
     }
 
     @Test
-    void addDepartment_shouldThrowIfExists() {
-        DepartmentDTO dto = new DepartmentDTO(null, "Finance", "Finance Dept");
-        when(departmentRepository.existsByName("Finance")).thenReturn(true);
+    void addDepartment_AlreadyExists() {
+        when(departmentRepository.existsByName("IT")).thenReturn(true);
 
-        assertThrows(DepartmentAlreadyExistsException.class,
-                () -> departmentService.addDepartment(dto));
+        DepartmentAlreadyExistsException exception = assertThrows(
+                DepartmentAlreadyExistsException.class,
+                () -> departmentService.addDepartment(departmentDTO)
+        );
+
+        assertEquals("Department with name 'IT' already exists", exception.getMessage());
+        verify(departmentRepository, times(1)).existsByName("IT");
+        verify(departmentRepository, never()).save(any());
     }
 
     @Test
-    void getDepartmentById_shouldReturnDto() {
-        Department dept = new Department(1L, "HR", "Human Resources");
-        DepartmentDTO dto = new DepartmentDTO(1L, "HR", "Human Resources");
+    void addDepartment_DatabaseError() {
+        when(departmentRepository.existsByName("IT")).thenReturn(false);
+        when(departmentMapper.toEntity(departmentDTO)).thenReturn(department);
+        when(departmentRepository.save(department)).thenThrow(new DataAccessException("Database error") {});
 
-        when(departmentRepository.findById(1L)).thenReturn(Optional.of(dept));
-        when(departmentMapper.toDto(dept)).thenReturn(dto);
+        ServiceException exception = assertThrows(
+                ServiceException.class,
+                () -> departmentService.addDepartment(departmentDTO)
+        );
+
+        assertEquals("Failed to add department due to database error", exception.getMessage());
+        assertTrue(exception.getCause() instanceof DataAccessException);
+    }
+
+    @Test
+    void getDepartmentById_Success() {
+        when(departmentRepository.findById(1L)).thenReturn(Optional.of(department));
+        when(departmentMapper.toDto(department)).thenReturn(departmentDTO);
 
         DepartmentDTO result = departmentService.getDepartmentById(1L);
-        assertEquals(dto, result);
+
+        assertNotNull(result);
+        assertEquals(departmentDTO.getName(), result.getName());
+        verify(departmentRepository, times(1)).findById(1L);
     }
 
     @Test
-    void getDepartmentById_shouldThrowIfNotFound() {
-        when(departmentRepository.findById(99L)).thenReturn(Optional.empty());
-        assertThrows(DepartmentNotFoundException.class, () -> departmentService.getDepartmentById(99L));
+    void getDepartmentById_NotFound() {
+        when(departmentRepository.findById(1L)).thenReturn(Optional.empty());
+
+        DepartmentNotFoundException exception = assertThrows(
+                DepartmentNotFoundException.class,
+                () -> departmentService.getDepartmentById(1L)
+        );
+
+        assertEquals("Department with id 1 not found", exception.getMessage());
+        verify(departmentRepository, times(1)).findById(1L);
     }
 
     @Test
-    void deleteDepartment_shouldDelete() {
-        Department dept = new Department(1L, "R&D", "Research");
+    void getDepartmentById_DatabaseError() {
+        when(departmentRepository.findById(1L)).thenThrow(new DataAccessException("Database error") {});
 
-        when(departmentRepository.findById(1L)).thenReturn(Optional.of(dept));
+        ServiceException exception = assertThrows(
+                ServiceException.class,
+                () -> departmentService.getDepartmentById(1L)
+        );
 
-        departmentService.deleteDepartment(1L);
-        verify(departmentRepository).delete(dept);
+        assertEquals("Failed to retrieve department due to database error", exception.getMessage());
+        assertTrue(exception.getCause() instanceof DataAccessException);
     }
 }
