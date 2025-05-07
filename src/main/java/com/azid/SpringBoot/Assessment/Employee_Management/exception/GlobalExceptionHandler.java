@@ -1,4 +1,4 @@
-package com.azid.SpringBoot.Assessment.Employee_Management.exception;
+package com.azid.springboot.assessment.employee_management.exception;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;

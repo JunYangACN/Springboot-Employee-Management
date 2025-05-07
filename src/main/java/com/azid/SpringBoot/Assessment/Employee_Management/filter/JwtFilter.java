@@ -1,6 +1,6 @@
-package com.azid.SpringBoot.Assessment.Employee_Management.filter;
+package com.azid.springboot.assessment.employee_management.filter;
 
-import com.azid.SpringBoot.Assessment.Employee_Management.util.JwtUtil;
+import com.azid.springboot.assessment.employee_management.util.JwtUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

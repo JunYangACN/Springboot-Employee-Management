@@ -1,7 +1,7 @@
-package com.azid.SpringBoot.Assessment.Employee_Management.mapper;
+package com.azid.springboot.assessment.employee_management.mapper;
 
-import com.azid.SpringBoot.Assessment.Employee_Management.dto.DepartmentDTO;
-import com.azid.SpringBoot.Assessment.Employee_Management.entity.Department;
+import com.azid.springboot.assessment.employee_management.dto.DepartmentDTO;
+import com.azid.springboot.assessment.employee_management.entity.Department;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

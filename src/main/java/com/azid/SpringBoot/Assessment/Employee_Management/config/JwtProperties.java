@@ -1,4 +1,4 @@
-package com.azid.SpringBoot.Assessment.Employee_Management.config;
+package com.azid.springboot.assessment.employee_management.config;
 
 import lombok.Getter;
 import lombok.Setter;
