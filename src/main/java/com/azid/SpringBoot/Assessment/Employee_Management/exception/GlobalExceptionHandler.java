@@ -107,4 +107,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(buildResponse(HttpStatus.CONFLICT, e.getMessage()), HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<Object> handleEmailAlreadyExists(EmailAlreadyExistsException e) {
+        return new ResponseEntity<>(buildResponse(HttpStatus.CONFLICT, e.getMessage()), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(PhoneNoAlreadyExistsException.class)
+    public ResponseEntity<Object> handlePhoneNoAlreadyExists(PhoneNoAlreadyExistsException e) {
+        return new ResponseEntity<>(buildResponse(HttpStatus.CONFLICT, e.getMessage()), HttpStatus.CONFLICT);
+    }
 }
