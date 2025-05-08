@@ -1,6 +1,7 @@
-package com.azid.springboot.assessment.employee_management.DepartmentUnitTest;
+package com.azid.SpringBoot.Assessment.Employee_Management.DepartmentUnitTest;
 
 import com.azid.springboot.assessment.employee_management.dto.DepartmentDTO;
+import com.azid.springboot.assessment.employee_management.dto.DepartmentResponseDTO;
 import com.azid.springboot.assessment.employee_management.entity.Department;
 import com.azid.springboot.assessment.employee_management.exception.DepartmentAlreadyExistsException;
 import com.azid.springboot.assessment.employee_management.exception.DepartmentNotFoundException;
@@ -100,7 +101,7 @@ class DepartmentServiceTest {
         when(departmentRepository.findById(1L)).thenReturn(Optional.of(department));
         when(departmentMapper.toDto(department)).thenReturn(departmentDTO);
 
-        DepartmentDTO result = departmentService.getDepartmentById(1L);
+        DepartmentResponseDTO result = departmentService.getDepartmentById(1L);
 
         assertNotNull(result);
         assertEquals(departmentDTO.getName(), result.getName());

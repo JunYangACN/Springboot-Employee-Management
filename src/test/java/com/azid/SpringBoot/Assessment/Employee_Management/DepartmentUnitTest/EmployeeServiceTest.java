@@ -1,4 +1,4 @@
-package com.azid.springboot.assessment.employee_management.DepartmentUnitTest;
+package com.azid.SpringBoot.Assessment.Employee_Management.DepartmentUnitTest;
 
 import com.azid.springboot.assessment.employee_management.dto.DepartmentDTO;
 import com.azid.springboot.assessment.employee_management.dto.EmployeeDTO;
@@ -59,7 +59,6 @@ class EmployeeServiceTest {
         department.setDescription("Information Technology");
 
         employeeDTO = EmployeeDTO.builder()
-                .id(1L)
                 .name("John Doe")
                 .email("john.doe@example.com")
                 .phoneNo("+1234567890")
