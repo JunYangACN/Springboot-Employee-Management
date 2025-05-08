@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class DepartmentDTO {
+
     private Long id;
 
     @NotBlank(message = "Department name is required")

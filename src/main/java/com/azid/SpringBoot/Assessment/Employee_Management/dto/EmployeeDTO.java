@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class EmployeeDTO {
-    private Long id;
+
 
     @NotBlank(message = "Employee Name is required")
     private String name;

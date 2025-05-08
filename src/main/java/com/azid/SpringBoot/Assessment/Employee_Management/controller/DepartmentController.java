@@ -1,6 +1,9 @@
 package com.azid.springboot.assessment.employee_management.controller;
 
 import com.azid.springboot.assessment.employee_management.dto.DepartmentDTO;
+import com.azid.springboot.assessment.employee_management.dto.DepartmentResponseDTO;
+import com.azid.springboot.assessment.employee_management.dto.UpdateDepartmentDTO;
+import com.azid.springboot.assessment.employee_management.exception.DepartmentNotFoundException;
 import com.azid.springboot.assessment.employee_management.service.DepartmentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,85 +29,56 @@ public class DepartmentController {
 
     @PostMapping("/create-department")
     public ResponseEntity<DepartmentDTO> addDepartment(@RequestBody @Valid DepartmentDTO departmentDTO) throws JsonProcessingException {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            String body = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(departmentDTO);
+        ObjectMapper mapper = new ObjectMapper();
+        String body = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(departmentDTO);
 
-            log.info("Received request to add department: {}", body);
-            DepartmentDTO addedDepartment = departmentService.addDepartment(departmentDTO);
-            log.info("Added Department: {}", addedDepartment);
-            return ResponseEntity.status(HttpStatus.CREATED).body(addedDepartment);
-        } catch (Exception e) {
-            log.error("Error adding department: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+        log.info("Received request to add department: {}", body);
+        DepartmentDTO addedDepartment = departmentService.addDepartment(departmentDTO);
+        log.info("Added Department: {}", addedDepartment);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addedDepartment);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getDepartment(@PathVariable Long id) {
         try {
-            DepartmentDTO department = departmentService.getDepartmentById(id);
+            DepartmentResponseDTO department = departmentService.getDepartmentById(id);
             return ResponseEntity.ok(department);
-        } catch (IllegalArgumentException e) {
-            log.error("Department not found for ID: {}", id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Department not found");
-        } catch (Exception e) {
-            log.error("Error retrieving department: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving department");
+        } catch (DepartmentNotFoundException e) {
+            log.error("Department not found: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
 
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllDepartment() {
-        try {
-            List<DepartmentDTO> departments = departmentService.getAllDepartments();
-            return ResponseEntity.ok(departments);
-        } catch (Exception e) {
-            log.error("Error retrieving all departments: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving departments");
-        }
+        List<DepartmentResponseDTO> departments = departmentService.getAllDepartments();
+        return ResponseEntity.ok(departments);
     }
 
     @PutMapping("/update-department/{id}")
-    public ResponseEntity<?> updateDepartment(@PathVariable Long id, @RequestBody @Valid DepartmentDTO departmentDTO) {
+    public ResponseEntity<?> updateDepartment(@PathVariable Long id, @RequestBody @Valid UpdateDepartmentDTO updatedepartmentDTO) {
         try {
-            DepartmentDTO updated = departmentService.updateDepartment(id, departmentDTO);
+            UpdateDepartmentDTO updated = departmentService.updateDepartment(id, updatedepartmentDTO);
             return ResponseEntity.ok(updated);
-        } catch (IllegalArgumentException e) {
-            log.error("Department not found for ID: {}", id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Department not found");
-        } catch (Exception e) {
-            log.error("Error updating department: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating department");
+        } catch (DepartmentNotFoundException e) {
+            log.error("Update failed - Department not found: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
 
     @DeleteMapping("/delete-department/{id}")
     public ResponseEntity<?> deleteDepartment(@PathVariable Long id) {
         try {
             departmentService.deleteDepartment(id);
-            return ResponseEntity.ok("Department ID: " + id + " deleted");
-        } catch (IllegalArgumentException e) {
-            log.error("Department not found for ID: {}", id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Department not found");
-        } catch (Exception e) {
-            log.error("Error deleting department: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting department");
+            return ResponseEntity.ok("Department with ID " + id + " deleted successfully.");
+        } catch (DepartmentNotFoundException e) {
+            log.error("Delete failed - Department not found: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseBody
-    public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        String errorMessage = ex.getBindingResult().getFieldError().getDefaultMessage();
-        log.error("Validation error: {}", errorMessage);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
-    }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseBody
-    public ResponseEntity<String> handleGeneralExceptions(Exception ex) {
-        log.error("An error occurred: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
-    }
 }

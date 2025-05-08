@@ -1,12 +1,16 @@
 package com.azid.springboot.assessment.employee_management.service;
 
 import com.azid.springboot.assessment.employee_management.dto.DepartmentDTO;
+import com.azid.springboot.assessment.employee_management.dto.DepartmentResponseDTO;
+import com.azid.springboot.assessment.employee_management.dto.UpdateDepartmentDTO;
 import com.azid.springboot.assessment.employee_management.entity.Department;
 import com.azid.springboot.assessment.employee_management.exception.DepartmentAlreadyExistsException;
+import com.azid.springboot.assessment.employee_management.exception.DepartmentInUseException;
 import com.azid.springboot.assessment.employee_management.exception.DepartmentNotFoundException;
 import com.azid.springboot.assessment.employee_management.exception.ServiceException;
 import com.azid.springboot.assessment.employee_management.mapper.DepartmentMapper;
 import com.azid.springboot.assessment.employee_management.repository.DepartmentRepository;
+import com.azid.springboot.assessment.employee_management.repository.EmployeeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -21,10 +25,12 @@ public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
     private final DepartmentMapper departmentMapper;
+    private final EmployeeRepository employeeRepository;
 
-    public DepartmentService(DepartmentRepository departmentRepository, DepartmentMapper departmentMapper) {
+    public DepartmentService(DepartmentRepository departmentRepository, DepartmentMapper departmentMapper, EmployeeRepository employeeRepository) {
         this.departmentRepository = departmentRepository;
         this.departmentMapper = departmentMapper;
+        this.employeeRepository = employeeRepository;
     }
 
     public DepartmentDTO addDepartment(DepartmentDTO departmentDTO) {
@@ -44,38 +50,43 @@ public class DepartmentService {
         }
     }
 
-    public DepartmentDTO getDepartmentById(Long id) {
+    public DepartmentResponseDTO getDepartmentById(Long id) {
         try {
             log.info("Fetching department with ID: {}", id);
             Department department = departmentRepository.findById(id)
                     .orElseThrow(() -> new DepartmentNotFoundException("Department with id " + id + " not found"));
-            return departmentMapper.toDto(department);
+            return departmentMapper.toResDto(department);
         } catch (DataAccessException e) {
             log.error("Database error while fetching department: {}", e.getMessage());
             throw new ServiceException("Failed to retrieve department due to database error", e);
         }
     }
 
-    public List<DepartmentDTO> getAllDepartments() {
+    public List<DepartmentResponseDTO> getAllDepartments() {
         try {
             return departmentRepository.findAll().stream()
-                    .map(departmentMapper::toDto)
+                    .map(departmentMapper::toResDto)
                     .collect(Collectors.toList());
         } catch (DataAccessException e) {
             throw new ServiceException("Failed to retrieve departments due to database error", e);
         }
     }
 
-    public DepartmentDTO updateDepartment(Long id, DepartmentDTO departmentDTO) {
+    public UpdateDepartmentDTO updateDepartment(Long id, UpdateDepartmentDTO updatedepartmentDTO) {
         try {
+
+            log.info("Updating department with ID: {}", id);
+            log.info("New description: {}", updatedepartmentDTO.getDescription());
+
             Department existing = departmentRepository.findById(id)
                     .orElseThrow(() -> new DepartmentNotFoundException("Department with id " + id + " not found"));
 
-            existing.setName(departmentDTO.getName());
-            existing.setDescription(departmentDTO.getDescription());
+            existing.setDescription(updatedepartmentDTO.getDescription());
 
             Department updated = departmentRepository.save(existing);
-            return departmentMapper.toDto(updated);
+            log.info("Department with ID {} updated successfully", id);
+
+            return departmentMapper.toUpDto(updated);
         } catch (DataAccessException e) {
             throw new ServiceException("Failed to update department due to database error", e);
         }
@@ -85,7 +96,15 @@ public class DepartmentService {
         try {
             Department department = departmentRepository.findById(id)
                     .orElseThrow(() -> new DepartmentNotFoundException("Department with id " + id + " not found"));
+            // Check if any employee is assigned to this department
+
+            boolean hasEmployees = employeeRepository.existsByDepartment(department);
+            if (hasEmployees) {
+                log.error("Cannot delete department with ID {} because it has assigned employees", id);
+                throw new DepartmentInUseException("Department is assigned to existing employees.");
+            }
             departmentRepository.delete(department);
+            log.info("Department with ID {} deleted successfully", id);
         } catch (DataAccessException e) {
             throw new ServiceException("Failed to delete department due to database error", e);
         }
